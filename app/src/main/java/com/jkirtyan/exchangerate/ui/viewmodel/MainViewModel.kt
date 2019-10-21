@@ -1,35 +1,47 @@
 package com.jkirtyan.exchangerate.ui.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.*
+import com.jkirtyan.exchangerate.ExchangeRateApplication.Companion.baseCurrencyCode
+import com.jkirtyan.exchangerate.ExchangeRateService
 import com.jkirtyan.exchangerate.entity.ExchangeRateResponse
-import io.reactivex.Single
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Response
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor() : ViewModel(), LifecycleObserver {
-    @Inject lateinit var exchangeRateCall: Single<Response<ExchangeRateResponse>>
+    @Inject lateinit var service: ExchangeRateService
     private var disposable: Disposable? = null
 
     var exchangeRate = MutableLiveData<ExchangeRateResponse>()
 
+    @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private fun onResume() {
-        disposable = exchangeRateCall
+        Observable
+            .interval(1, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .delay(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .repeat()
-            .subscribe (
+            .subscribe(
                 {
-                    exchangeRate.value = it.body()
+                    service.getExchangeRate(baseCurrencyCode)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            {
+                                if (it.isSuccessful) {
+                                    exchangeRate.value = it.body()
+                                } else {
+                                    // TODO: handle it
+                                }
+                            },
+                            Throwable::printStackTrace // TODO: handle it
+                        )
                 },
-                {
-                    it.printStackTrace()
-                }
+                Throwable::printStackTrace // TODO: handle it
             )
     }
 

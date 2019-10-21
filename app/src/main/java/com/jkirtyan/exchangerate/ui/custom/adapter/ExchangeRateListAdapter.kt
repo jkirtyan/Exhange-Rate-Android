@@ -5,6 +5,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jkirtyan.exchangerate.R
 import com.jkirtyan.exchangerate.databinding.ListItemExchangeRateBinding
@@ -14,9 +16,12 @@ import javax.inject.Inject
 
 class ExchangeRateListAdapter @Inject constructor() :
     RecyclerView.Adapter<ExchangeRateListAdapter.Holder>(),
-    TextWatcher {
+    TextWatcher,
+    Observer<DiffUtil.DiffResult> {
 
-    private val viewModel = ExchangeRateListViewModel()
+    private val viewModel = ExchangeRateListViewModel().also {
+        it.baseChangeAction.observeForever(this)
+    }
 
     var exchangeRate: ExchangeRateResponse? = null
         set(value) {
@@ -49,6 +54,34 @@ class ExchangeRateListAdapter @Inject constructor() :
         }
     }
 
+    override fun onChanged(diffResult: DiffUtil.DiffResult?) {
+        diffResult?.let { diffs ->
+            diffs.dispatchUpdatesTo(this)
+            recyclerView?.scrollToPosition(0)
+
+            recyclerView?.postOnAnimationDelayed(
+                {
+                    notifyDataSetChanged() // TODO: improve it to update only the necessary items
+                },
+                ((recyclerView?.itemAnimator?.moveDuration ?: 250) * 1.2).toLong()
+            )
+
+
+            viewModel.onBaseChangeFinished()
+        }
+    }
+
+    private var recyclerView: RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        this.recyclerView = null
+    }
 
     override fun afterTextChanged(s: Editable?) {
         // to do nothing

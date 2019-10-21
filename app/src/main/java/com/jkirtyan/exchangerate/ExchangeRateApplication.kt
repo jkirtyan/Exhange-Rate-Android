@@ -7,6 +7,7 @@ import com.jkirtyan.exchangerate.di.DaggerAppComponent
 class ExchangeRateApplication: Application() {
     companion object {
         lateinit var appComponent: AppComponent
+        var baseCurrencyCode: String = "EUR"
     }
 
     override fun onCreate() {

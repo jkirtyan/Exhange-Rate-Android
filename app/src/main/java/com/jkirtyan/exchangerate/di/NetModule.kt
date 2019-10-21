@@ -22,7 +22,4 @@ class NetModule {
             .build()
             .create<ExchangeRateService>(ExchangeRateService::class.java)
     }
-
-    @Provides
-    fun provideExchangeRate(service: ExchangeRateService) = service.getExchangeRate()
 }
