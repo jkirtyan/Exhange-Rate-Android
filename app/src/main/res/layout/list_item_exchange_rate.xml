@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="position"
+            type="Integer" />
+
+        <variable
+            name="viewModel"
+            type="com.jkirtyan.exchangerate.ui.viewmodel.ExchangeRateListViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgFlag"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"
+            app:currencyCode="@{viewModel.currencyCode(position)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/flag_huf" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCurrencyCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="sans-serif"
+            android:text="@{viewModel.currencyCode(position)}"
+            android:textColor="@color/textPrimary"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/etRate"
+            app:layout_constraintStart_toEndOf="@id/imgFlag"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="HUF" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvCurrencyName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif"
+            android:text="@{viewModel.currencyName(position)}"
+            android:textColor="@color/textSecondary"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/etRate"
+            app:layout_constraintStart_toEndOf="@id/imgFlag"
+            tools:text="Hungarian forint" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:enabled="@{viewModel.editable(position)}"
+            android:fontFamily="sans-serif"
+            android:inputType="numberDecimal"
+            android:minWidth="40dp"
+            android:text="@{viewModel.value(position)}"
+            android:textColor="@drawable/text_color_edit_text"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
